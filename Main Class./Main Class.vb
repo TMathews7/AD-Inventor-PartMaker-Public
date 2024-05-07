@@ -25,9 +25,10 @@ Public Class MainClass
                         Dim radius As Double = form.Radius
                         Dim height As Double = form.Height
                         Dim wingspan As Double = form.Wingspan
+                        Dim holeRadius As Double = form.HoleRadius
 
                         ' Create a fan using the provided dimensions
-                        Propeller.CreatePropeller(radius, height, wingspan)
+                        Propeller.CreatePropeller(radius, height, wingspan, holeRadius)
                     Case "???"
                         ' Add code to execute the functionality for L Steel here
                 End Select
