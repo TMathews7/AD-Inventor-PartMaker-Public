@@ -2,7 +2,7 @@ Imports System.Runtime.InteropServices
 Imports Inventor
 
 Public Class Propeller
-    Public Shared Sub CreatePropeller(radius As Double, height As Double, clearanceDiameter As Double)
+    Public Shared Sub CreatePropeller(radius As Double, height As Double, clearanceDiameter As Double, HoleRadius As Double)
         Try
             ' Connect to the running instance of Inventor
             Dim inventorApp As Inventor.Application = MarshalHelper.GetActiveObject("Inventor.Application")
@@ -55,7 +55,7 @@ Public Class Propeller
 
             ' Draw a circle on the sketch for the clearance hole.
             Dim oClearanceCircle As SketchCircle
-            oClearanceCircle = oSketch2.SketchCircles.AddByCenterRadius(centerPoint, clearanceDiameter / 2)
+            oClearanceCircle = oSketch2.SketchCircles.AddByCenterRadius(centerPoint, HoleRadius)
 
             ' Create a profile for the clearance hole.
             Dim oClearanceProfile As Profile
@@ -64,7 +64,7 @@ Public Class Propeller
             ' Create a solid extrusion for the clearance hole.
             Dim oClearanceExtrudeDef As ExtrudeDefinition
             oClearanceExtrudeDef = oCompDef.Features.ExtrudeFeatures.CreateExtrudeDefinition(oClearanceProfile, PartFeatureOperationEnum.kCutOperation)
-            oClearanceExtrudeDef.SetDistanceExtent(height + 1, PartFeatureExtentDirectionEnum.kPositiveExtentDirection) ' Ensure the hole goes all the way through
+            oClearanceExtrudeDef.SetDistanceExtent(height + 1, PartFeatureExtentDirectionEnum.kPositiveExtentDirection) ' Adds 1 to ensure it goes all the way through,
             Dim oClearanceExtrusion As ExtrudeFeature
             oClearanceExtrusion = oCompDef.Features.ExtrudeFeatures.Add(oClearanceExtrudeDef)
 
