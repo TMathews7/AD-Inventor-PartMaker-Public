@@ -9,6 +9,7 @@ Public Class Form1
     Public Property Depth As Double
     Public Property Radius As Double
     Public Property Wingspan As Double
+    Public Property HoleRadius As Double
     Public Property SelectedOption As String
 
     ' Form1 initialization code
@@ -142,6 +143,19 @@ Public Class Form1
                 Panel1.Controls.Add(textBoxWingspan)
                 AddHandler textBoxWingspan.TextChanged, AddressOf textBoxWingspan_TextChanged
 
+                Dim labelHoleRadius As New Label()
+                labelHoleRadius.Text = "Hole Radius (CM)"
+                labelHoleRadius.ForeColor = Color.White
+                labelHoleRadius.Location = New Point(100, 100)
+                Panel1.Controls.Add(labelHoleRadius)
+
+                Dim textBoxHoleRadius As New TextBox()
+                textBoxHoleRadius.Location = New Point(10 - 15, 100)
+                textBoxHoleRadius.Font = New Font(textBoxHoleRadius.Font, FontStyle.Bold)
+                textBoxHoleRadius.TextAlign = HorizontalAlignment.Right
+                Panel1.Controls.Add(textBoxHoleRadius)
+                AddHandler textBoxHoleRadius.TextChanged, AddressOf textBoxHoleRadius_TextChanged
+
 
             Case "???"
                 ' Add input controls
@@ -178,4 +192,11 @@ Public Class Form1
             Wingspan = wingspanValue
         End If
     End Sub
+    Private Sub textBoxHoleRadius_TextChanged(sender As Object, e As EventArgs)
+        Dim holeRadiusValue As Double
+        If Double.TryParse(CType(sender, TextBox).Text, holeRadiusValue) Then
+            HoleRadius = holeRadiusValue
+        End If
+    End Sub
 End Class
+
