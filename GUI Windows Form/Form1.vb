@@ -416,6 +416,32 @@ Public Class Form1
                 PartsPanel.Controls.Add(textBoxLengthSquare)
                 AddHandler textBoxLengthSquare.TextChanged, AddressOf textBoxLength_TextChanged
 
+                Dim labelNumHoles As New Label()
+                labelNumHoles.Text = "# of Holes"
+                labelNumHoles.ForeColor = Color.Black
+                labelNumHoles.Location = New Point(100, 130)
+                PartsPanel.Controls.Add(labelNumHoles)
+
+                Dim textBoxNumHoles As New System.Windows.Forms.TextBox()
+                textBoxNumHoles.Location = New Point(0, 130)
+                textBoxNumHoles.Font = New Font(textBoxNumHoles.Font, FontStyle.Bold)
+                textBoxNumHoles.TextAlign = HorizontalAlignment.Right
+                PartsPanel.Controls.Add(textBoxNumHoles)
+                AddHandler textBoxNumHoles.TextChanged, AddressOf textBoxNumHoles_TextChanged
+
+                Dim labelHoleRadius As New Label()
+                labelHoleRadius.Text = "HoleRadius"
+                labelHoleRadius.ForeColor = Color.Black
+                labelHoleRadius.Location = New Point(100, 160)
+                PartsPanel.Controls.Add(labelHoleRadius)
+
+                Dim textBoxHoleRadius As New System.Windows.Forms.TextBox()
+                textBoxHoleRadius.Location = New Point(0, 160)
+                textBoxHoleRadius.Font = New Font(textBoxHoleRadius.Font, FontStyle.Bold)
+                textBoxHoleRadius.TextAlign = HorizontalAlignment.Right
+                PartsPanel.Controls.Add(textBoxHoleRadius)
+                AddHandler textBoxHoleRadius.TextChanged, AddressOf textBoxHoleRadius_TextChanged
+
             Case "???"
                 ' Add input controls
                 ' Add your code
