@@ -1,0 +1,27 @@
+Imports System
+Imports System.Net
+Imports System.Runtime.InteropServices
+Imports Inventor
+
+Namespace HSSCircleDrawing
+    Public Class HSSCircle
+        Public Shared Sub DrawHSSCircle(radius As Double, thickness As Double, length As Double)
+            Try
+                ' Connect to the running instance of Inventor
+                Dim inventorApp As Inventor.Application = MarshalHelper.GetActiveObject("Inventor.Application")
+
+                If inventorApp Is Nothing Then
+                    Console.WriteLine("Failed to connect to the running instance of Inventor.")
+                    Return
+                End If
+
+                Console.WriteLine("HSS Circle created successfully.")
+            Catch ex As Exception
+                Console.WriteLine("An error occurred: " & ex.Message)
+            End Try
+        End Sub
+    End Class
+End Namespace
+
+' This has not yet been implemented
+
