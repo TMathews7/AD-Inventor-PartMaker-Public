@@ -2,11 +2,10 @@ Imports System
 Imports System.Net
 Imports System.Runtime.InteropServices
 Imports Inventor
-Imports Windows.Win32.System
 
-Namespace LBeamDrawing
-    Public Class LBeam
-        Public Shared Sub DrawLBeam(height As Double, width As Double, thickness As Double, length As Double, numHoles As Double, HoleRadius As Double)
+Namespace HSSSquareDrawing
+    Public Class HSSSquare
+        Public Shared Sub DrawHSSSquare(height As Double, width As Double, thickness As Double, length As Double, HoleRadius As Double, numHoles As Double)
             Try
                 ' Connect to the running instance of Inventor
                 Dim inventorApp As Inventor.Application = MarshalHelper.GetActiveObject("Inventor.Application")
@@ -34,7 +33,7 @@ Namespace LBeamDrawing
                 Dim transGeom As TransientGeometry = inventorApp.TransientGeometry
 
                 ' Draw a rectangle based on user input
-                Dim endPoint As Point2d = transGeom.CreatePoint2d(width, height) ' Use user input for rectangle dimensions
+                Dim endPoint As Point2d = transGeom.CreatePoint2d(width + (thickness * 2), height + (thickness * 2)) ' Use user input for rectangle dimensions
                 Dim rectangleLines As SketchEntitiesEnumerator = sketch.SketchLines.AddAsTwoPointRectangle(transGeom.CreatePoint2d(0, 0), endPoint)
 
                 ' Create a profile
@@ -73,19 +72,10 @@ Namespace LBeamDrawing
                     Dim holeY As Double
                     Dim holeZ As Double
 
-                    If length > width AndAlso length > height Then
-                        spacing = length / (numHoles + 1)
-                        position = width
-                        holeY = (i * spacing)
-                        holeZ = (position / 2)
-                    Else
-                        spacing = height / (numHoles + 1)
-                        position = length
-                        holeY = (position / 2)
-                        holeZ = (i * spacing)
-                    End If
-
-                    Console.WriteLine("Hole center coordinates: (" & holeZ & ", " & holeY & ")")
+                    spacing = length / (numHoles + 1)
+                    position = width
+                    holeY = (i * spacing)
+                    holeZ = ((thickness) + position / 2)
 
                     ' Create a point for the hole center
                     Dim holeCenter As Point2d = transGeom.CreatePoint2d(holeZ, holeY)
@@ -101,7 +91,7 @@ Namespace LBeamDrawing
 
                     ' Create a solid extrusion for the clearance hole.
                     Dim clearanceExtrudeDef2 As ExtrudeDefinition = compDef.Features.ExtrudeFeatures.CreateExtrudeDefinition(clearanceProfile2, PartFeatureOperationEnum.kCutOperation)
-                    clearanceExtrudeDef2.SetDistanceExtent(thickness + 1, PartFeatureExtentDirectionEnum.kPositiveExtentDirection) ' Adds 1 to ensure it goes all the way through
+                    clearanceExtrudeDef2.SetDistanceExtent((thickness + width) + 1, PartFeatureExtentDirectionEnum.kPositiveExtentDirection) ' Adds 1 to ensure it goes all the way through
                     Dim clearanceExtrusion2 As ExtrudeFeature = compDef.Features.ExtrudeFeatures.Add(clearanceExtrudeDef2)
 
                     ' Update the part document
@@ -112,19 +102,10 @@ Namespace LBeamDrawing
                     Dim holeY As Double
                     Dim holeZ As Double
 
-                    If length > width AndAlso length > height Then
-                        spacing = length / (numHoles + 1)
-                        position = width
-                        holeY = (i * spacing)
-                        holeZ = -(position / 2)
-                    Else
-                        spacing = width / (numHoles + 1)
-                        position = length
-                        holeY = (position / 2)
-                        holeZ = -(i * spacing)
-                    End If
-
-                    Console.WriteLine("Hole center coordinates: (" & holeZ & ", " & holeY & ")")
+                    spacing = length / (numHoles + 1)
+                    position = width
+                    holeY = (i * spacing)
+                    holeZ = -((thickness) + position / 2)
 
                     ' Create a point for the hole center
                     Dim holeCenter As Point2d = transGeom.CreatePoint2d(holeZ, holeY)
@@ -140,7 +121,7 @@ Namespace LBeamDrawing
 
                     ' Create a solid extrusion for the clearance hole.
                     Dim clearanceExtrudeDef2 As ExtrudeDefinition = compDef.Features.ExtrudeFeatures.CreateExtrudeDefinition(clearanceProfile2, PartFeatureOperationEnum.kCutOperation)
-                    clearanceExtrudeDef2.SetDistanceExtent(thickness + 1, PartFeatureExtentDirectionEnum.kPositiveExtentDirection) ' Adds 1 to ensure it goes all the way through
+                    clearanceExtrudeDef2.SetDistanceExtent((thickness + height) + 1, PartFeatureExtentDirectionEnum.kPositiveExtentDirection) ' Adds 1 to ensure it goes all the way through
                     Dim clearanceExtrusion2 As ExtrudeFeature = compDef.Features.ExtrudeFeatures.Add(clearanceExtrudeDef2)
 
                     ' Update the part document
