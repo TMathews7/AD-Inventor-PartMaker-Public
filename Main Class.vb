@@ -283,9 +283,12 @@ Public Class MainClass
                         Dim width As Double = form.Width
                         Dim thickness As Double = form.Thickness
                         Dim length As Double = form.Length
+                        Dim holeRadius As Double = form.HoleRadius
+                        Dim numHoles As Double = form.numHoles
+
 
                         Dim hssSquareDrawer As New HSSSquareDrawing.HSSSquare()
-                        hssSquareDrawer.DrawHSSSquare(height, width, thickness, length)
+                        hssSquareDrawer.DrawHSSSquare(height, width, thickness, length, HoleRadius, numHoles)
 
                     Case "Channel"
                         Dim height As Double = form.Height
@@ -307,5 +310,3 @@ Public Class MainClass
         End Try
     End Sub
 End Class
-
-
