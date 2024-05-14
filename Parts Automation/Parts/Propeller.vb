@@ -18,17 +18,61 @@ Namespace PropellerDrawing
                 ' Define the constant for the part document type
                 Const kPartDocumentObject As DocumentTypeEnum = DocumentTypeEnum.kPartDocumentObject
 
+                ' Set a reference to the component definition
+                Dim inventorDoc As PartDocument = inventorApp.Documents.Add(DocumentTypeEnum.kPartDocumentObject)
+                Dim compDef As PartComponentDefinition = inventorDoc.ComponentDefinition
+
                 ' Create a new part document using the default part template.
                 Dim oPartDoc As PartDocument
                 oPartDoc = inventorApp.Documents.Add(kPartDocumentObject, inventorApp.FileManager.GetTemplateFile(kPartDocumentObject))
 
+                ' Create a new sketch on the X-Y work plane
+                Dim sketch As PlanarSketch = compDef.Sketches.Add(compDef.WorkPlanes(3))
+
+                Dim oTG As TransientGeometry = inventorApp.TransientGeometry
+
+                Dim oPartDocA As PartDocument = inventorApp.ActiveDocument
+                Dim oCompDef As PartComponentDefinition = oPartDocA.ComponentDefinition
+
+                Dim origin As Point2d = oTG.CreatePoint2d(0, 0)
+                Dim rt As Point2d = oTG.CreatePoint2d(radius / 2, 0)
+
+                Dim oSketch As PlanarSketch = oCompDef.Sketches.Add(oCompDef.WorkPlanes(1))
+                Dim pgon As SketchEntitiesEnumerator = oSketch.SketchLines.AddAsPolygon(numBlades, origin, rt, False)
+
+                Dim oProfile As Profile = oSketch.Profiles.AddForSolid
+                Dim oExtrude As ExtrudeFeature
+                oExtrude = oCompDef.Features.ExtrudeFeatures.AddByDistanceExtent(oProfile, height, PartFeatureExtentDirectionEnum.kPositiveExtentDirection, PartFeatureOperationEnum.kJoinOperation, 0)
+
+                Dim targetBodies As ObjectCollection = inventorApp.TransientObjects.CreateObjectCollection()
+
+                For i As Integer = 1 To numBlades
+                    Dim f As Face = oCompDef.Features.ExtrudeFeatures.Item(1).Faces.Item(i)
+                    Dim s As Sketch = oCompDef.Sketches.Add(f, True)
+
+                    ' Extrude the sketch
+                    Dim profileForExtrude As Profile = s.Profiles.AddForSolid()
+
+                    ' Create extrude definition
+                    Dim extrudeDef As ExtrudeDefinition = oCompDef.Features.ExtrudeFeatures.CreateExtrudeDefinition(profileForExtrude, PartFeatureOperationEnum.kNewBodyOperation)
+                    extrudeDef.SetDistanceExtent(Wingspan + (radius / 2), PartFeatureExtentDirectionEnum.kPositiveExtentDirection)
+
+                    ' Add the extrude feature
+                    Dim extrusion As ExtrudeFeature = oCompDef.Features.ExtrudeFeatures.Add(extrudeDef)
+
+                    targetBodies.Add(extrusion.SurfaceBody())
+                Next i
+
+                ' Add the extrude feature for the polygon to the targetBodies collection
+                Dim polygonExtrusion As ExtrudeFeature = oCompDef.Features.ExtrudeFeatures.AddByDistanceExtent(oProfile, height, PartFeatureExtentDirectionEnum.kPositiveExtentDirection, PartFeatureOperationEnum.kJoinOperation, 0)
+                targetBodies.Add(polygonExtrusion.SurfaceBody())
+
                 ' Set a reference to the part component definition.
-                Dim oCompDef As PartComponentDefinition
                 oCompDef = oPartDoc.ComponentDefinition
 
                 ' Create a new sketch on the X-Y work plane for the cylinder.
                 Dim oSketch1 As PlanarSketch
-                oSketch1 = oCompDef.Sketches.Add(oCompDef.WorkPlanes.Item(3))
+                oSketch1 = oCompDef.Sketches.Add(oCompDef.WorkPlanes.Item(1))
 
                 ' Set a reference to the transient geometry object.
                 Dim oTransGeom As TransientGeometry
@@ -39,40 +83,41 @@ Namespace PropellerDrawing
                 oCircle = oSketch1.SketchCircles.AddByCenterRadius(oTransGeom.CreatePoint2d(0, 0), radius)
 
                 ' Create a profile for the cylinder.
-                Dim oProfile As Profile
-                oProfile = oSketch1.Profiles.AddForSolid
+                Dim oProfileA As Profile
+                oProfileA = oSketch1.Profiles.AddForSolid
 
                 ' Create a solid extrusion for the cylinder.
-                Dim oExtrudeDef As ExtrudeDefinition
-                oExtrudeDef = oCompDef.Features.ExtrudeFeatures.CreateExtrudeDefinition(oProfile, PartFeatureOperationEnum.kNewBodyOperation)
-                oExtrudeDef.SetDistanceExtent(height, PartFeatureExtentDirectionEnum.kPositiveExtentDirection)
-                Dim oExtrusion As ExtrudeFeature
-                oExtrusion = oCompDef.Features.ExtrudeFeatures.Add(oExtrudeDef)
+                Dim circleExtrusionDef As ExtrudeDefinition
+                circleExtrusionDef = oCompDef.Features.ExtrudeFeatures.CreateExtrudeDefinition(oProfileA, PartFeatureOperationEnum.kNewBodyOperation)
+                circleExtrusionDef.SetDistanceExtent(height, PartFeatureExtentDirectionEnum.kPositiveExtentDirection)
+                Dim circleExtrusion As ExtrudeFeature
+                circleExtrusion = oCompDef.Features.ExtrudeFeatures.Add(circleExtrusionDef)
+                targetBodies.Add(circleExtrusion.SurfaceBody())
 
                 ' Get the center point of the circle
                 Dim centerPoint As Point2d = oCircle.CenterSketchPoint.Geometry
 
                 ' Create a new sketch on the same work plane as the circle for the clearance hole.
-                Dim oSketch2 As PlanarSketch
-                oSketch2 = oCompDef.Sketches.Add(oCompDef.WorkPlanes.Item(3))
+                Dim holeCutter As PlanarSketch
+                holeCutter = oCompDef.Sketches.Add(oCompDef.WorkPlanes.Item(1))
 
                 ' Draw a circle on the sketch for the clearance hole.
-                Dim oClearanceCircle As SketchCircle
-                oClearanceCircle = oSketch2.SketchCircles.AddByCenterRadius(centerPoint, HoleRadius)
+                Dim clearanceCircle As SketchCircle
+                clearanceCircle = holeCutter.SketchCircles.AddByCenterRadius(centerPoint, HoleRadius)
 
                 ' Create a profile for the clearance hole.
-                Dim oClearanceProfile As Profile
-                oClearanceProfile = oSketch2.Profiles.AddForSolid
+                Dim clearanceProfile As Profile
+                clearanceProfile = holeCutter.Profiles.AddForSolid
 
                 ' Create a solid extrusion for the clearance hole.
-                Dim oClearanceExtrudeDef As ExtrudeDefinition
-                oClearanceExtrudeDef = oCompDef.Features.ExtrudeFeatures.CreateExtrudeDefinition(oClearanceProfile, PartFeatureOperationEnum.kCutOperation)
-                oClearanceExtrudeDef.SetDistanceExtent(height + 1, PartFeatureExtentDirectionEnum.kPositiveExtentDirection) ' Adds 1 to ensure it goes all the way through,
-                Dim oClearanceExtrusion As ExtrudeFeature
-                oClearanceExtrusion = oCompDef.Features.ExtrudeFeatures.Add(oClearanceExtrudeDef)
+                Dim clearanceExtrudeDef As ExtrudeDefinition
+                clearanceExtrudeDef = oCompDef.Features.ExtrudeFeatures.CreateExtrudeDefinition(clearanceProfile, PartFeatureOperationEnum.kCutOperation)
 
-                ' Calculate the angle between each blade
-                Dim angleBetweenBlades As Double = 360.0 / numBlades
+                ' Apply the cut operation to the target bodies
+                clearanceExtrudeDef.AffectedBodies = targetBodies
+                clearanceExtrudeDef.SetDistanceExtent(height + 1, PartFeatureExtentDirectionEnum.kPositiveExtentDirection) ' Adds 1 to ensure it goes all the way through,
+                Dim clearanceExtrusion As ExtrudeFeature
+                clearanceExtrusion = oCompDef.Features.ExtrudeFeatures.Add(clearanceExtrudeDef)
 
                 Console.WriteLine("Propeller with clearance hole and wings created successfully.")
             Catch ex As Exception
@@ -82,4 +127,4 @@ Namespace PropellerDrawing
     End Class
 End Namespace
 
-' Having serious trouble with getting a circular pattern to function so this is being put on hold until i improve.
+' Breaking off for the time being, still incomplete but much closer than before
