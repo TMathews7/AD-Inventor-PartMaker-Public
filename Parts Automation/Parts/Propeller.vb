@@ -1,4 +1,5 @@
 Imports System
+Imports System.Drawing
 Imports System.Net
 Imports System.Runtime.InteropServices
 Imports Inventor
@@ -48,20 +49,32 @@ Namespace PropellerDrawing
 
                 For i As Integer = 1 To numBlades
                     Dim f As Face = oCompDef.Features.ExtrudeFeatures.Item(1).Faces.Item(i)
-                    Dim s As Sketch = oCompDef.Sketches.Add(f, True)
+                    Dim s As Sketch = oCompDef.Sketches.Add(f, False)
 
-                    ' Extrude the sketch
+                    ' Define the major axis vector
+                    Dim ellipseMajorAxisVector As UnitVector2d = oTG.CreateUnitVector2d(height / 2, 0) ' Major axis vector
+
+                    ' Define the rotation angle in radians (45 degrees)
+                    Dim angleInRadians As Double = Math.PI / 4  ' 45 degrees in radians
+
+                    ' Rotate the major axis vector
+                    Dim rotatedX As Double = Math.Cos(angleInRadians) * ellipseMajorAxisVector.X - Math.Sin(angleInRadians) * ellipseMajorAxisVector.Y
+                    Dim rotatedY As Double = Math.Sin(angleInRadians) * ellipseMajorAxisVector.X + Math.Cos(angleInRadians) * ellipseMajorAxisVector.Y
+
+                    ' Draw an ellipse on the sketch with the rotated major axis vector
+                    Dim ellipseCenter As Point2d = oTG.CreatePoint2d((height / 2), 0)
+                    Dim rotatedEllipseMajorAxisVector As UnitVector2d = oTG.CreateUnitVector2d(rotatedX, rotatedY)
+                    Dim ellipse As SketchEllipse = s.SketchEllipses.Add(ellipseCenter, rotatedEllipseMajorAxisVector, 1, height / 2)
+
+                    ' Extrude the ellipse
                     Dim profileForExtrude As Profile = s.Profiles.AddForSolid()
-
-                    ' Create extrude definition
                     Dim extrudeDef As ExtrudeDefinition = oCompDef.Features.ExtrudeFeatures.CreateExtrudeDefinition(profileForExtrude, PartFeatureOperationEnum.kNewBodyOperation)
-                    extrudeDef.SetDistanceExtent(Wingspan + (radius / 2), PartFeatureExtentDirectionEnum.kPositiveExtentDirection)
-
-                    ' Add the extrude feature
+                    extrudeDef.SetDistanceExtent(Wingspan, PartFeatureExtentDirectionEnum.kPositiveExtentDirection)
                     Dim extrusion As ExtrudeFeature = oCompDef.Features.ExtrudeFeatures.Add(extrudeDef)
 
                     targetBodies.Add(extrusion.SurfaceBody())
                 Next i
+
 
                 ' Add the extrude feature for the polygon to the targetBodies collection
                 Dim polygonExtrusion As ExtrudeFeature = oCompDef.Features.ExtrudeFeatures.AddByDistanceExtent(oProfile, height, PartFeatureExtentDirectionEnum.kPositiveExtentDirection, PartFeatureOperationEnum.kJoinOperation, 0)
@@ -126,5 +139,3 @@ Namespace PropellerDrawing
         End Sub
     End Class
 End Namespace
-
-' Breaking off for the time being, still incomplete but much closer than before
