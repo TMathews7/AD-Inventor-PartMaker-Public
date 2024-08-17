@@ -1,0 +1,14 @@
+<Addin Type="Standard">
+  <!--Created for Autodesk Inventor Version 29.0-->
+  <ClassId>{da9fdfd2-9431-42e5-bf66-05f66eda6196}</ClassId>
+  <ClientId>{da9fdfd2-9431-42e5-bf66-05f66eda6196}</ClientId>
+  <DisplayName>InventorAuto</DisplayName>
+  <Description>InventorAuto</Description>
+  <Assembly>InventorAuto.dll</Assembly>
+  <LoadOnStartUp>1</LoadOnStartUp>
+  <UserUnloadable>1</UserUnloadable>
+  <Hidden>0</Hidden>
+  <SupportedSoftwareVersionGreaterThan>28..</SupportedSoftwareVersionGreaterThan>
+  <DataVersion>1</DataVersion>
+  <UserInterfaceVersion>1</UserInterfaceVersion>
+</Addin>
