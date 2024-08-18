@@ -1,10 +1,14 @@
-Hello,
+Hello, 
 
-This file is not planned to be released publically or anything of the likes
-I am simply learning to use the Autodesk Inventor API, and learning VB.net
+I am not planning to release this publicly or help people set this up themselves, 
+  This is automation software so I leave a lot of the very complicated stuff out of the public document for ethical reasons
+I will update this ocasionally but my private github is the one that recieves most updates as I can update it with no concerns
 
-The MarshHelper in my code is not mine, I am unsure where I found it otherwise I would link it here.
+I will not leave functions or documents out I will simply leave them basically blank.
+  Example is my curve finder,
+    The curve finder can find any curve you want essentially so long as its straight
+      I plan to keep improving it until I can select any curve with the api i want
 
-As of current here are the things I am planning to implement,
+For this reason this github bit doesnt get updated much 
 
-Beyond that I plan to convert all CM inputs to MM, and to add a checkbox that allows you to use imperial units rather than metric.
+Apologies,
